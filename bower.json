@@ -1,0 +1,26 @@
+{
+  "name": "uda_fend_resume",
+  "homepage": "https://github.com/daniellarkin/frontend-nanodegree-arcade-game",
+  "authors": [
+    "Daniel Larkin <daniel.larkin@gmail.com>"
+  ],
+  "description": "Resume Project of Udacity FEND",
+  "main": "index.html",
+  "keywords": [
+    "project",
+    "js",
+    "FEND"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jQuery": "^3.1.1",
+    "bootstrap": "^3.3.7"
+  }
+}
