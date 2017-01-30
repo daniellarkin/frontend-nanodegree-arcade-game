@@ -15,7 +15,8 @@
     "gulp-istanbul": "^1.1.1",
     "gulp-jasmine": "^2.4.2",
     "gulp-uglify": "^2.0.1",
-    "jsdom": "^9.9.1"
+    "jsdom": "^9.9.1",
+    "mock-browser": "^0.92.12"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

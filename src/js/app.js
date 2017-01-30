@@ -91,7 +91,6 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this._x, this._y);
 };
 
-
 //---------------------------------------------------------------
 /**
  * @class Player
@@ -122,6 +121,28 @@ Player.prototype.setLocation = function(x,y) {
     this._x = x;
     this._y = y;
 };
+
+//---------------------------------------------------------------
+/**
+ * @description set the x,y coordinates of the player
+ * @param {number} x - horizontal location
+ * @param {number} y - vertical location
+ * @returns {number} - Players current horizontal and vertical position
+ */
+Player.prototype.getLocation = function() {
+    return [this._x, this._y];
+};
+
+
+//---------------------------------------------------------------
+/**
+ * @description Set the enemy object speed
+ * @param {number} speed - desired speed of the enemy object
+ * @return void
+ */
+Player.prototype.setSpeed = function(speed) {
+    this._speed  = speed;
+}
 
 
 //---------------------------------------------------------------
@@ -159,10 +180,10 @@ Player.prototype.handleInput = function(direction) {
     else if (direction == 'left' && this._x > 0){
     	this._x -= 10;
     }
-    else if (direction == 'right' && this._x < 410){
+    else if (direction == 'right' && this._x <= 410){
     	this._x += 10;
     }
-    else if (direction == 'down' && this._y < 420){
+    else if (direction == 'down' && this._y <= 420){
     	this._y += 10;
     }
 };
