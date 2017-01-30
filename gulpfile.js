@@ -5,6 +5,7 @@ var gutil       = require('gulp-util');
 var jasmine     = require('gulp-jasmine');
 var uglify      = require('gulp-uglify');
 var shell       = require('gulp-shell');
+var istanbul    = require('gulp-istanbul');
 
 var server;
 var dist = 'dist';
@@ -20,14 +21,14 @@ gulp.task('unit-test', function () {
 	    reporters: [ 'lcov' ],
 	    reportOpts: { dir: './docs/unit-test-coverage' }
 	})
-	);
+	     );
 });
 
 
 //-------------------------------------------------------------
 // jsDoc
 //-------------------------------------------------------------
-gulp.task('js-doc', shell.task(['jsdoc -d docs/jsdoc/ src/js/app.js docs/project_overview.md']));
+gulp.task('js-doc', shell.task(['jsdoc -d docs/jsdoc/ src/js/app.js src/js/specs/app-spec.js docs/project_overview.md']));
 
 //-------------------------------------------------------------
 // BrowserSync
