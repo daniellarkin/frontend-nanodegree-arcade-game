@@ -1,17 +1,91 @@
+"use strict";
 //---------------------------------------------------------------
 /**
  *
  * @author Daniel Larkin
  * @version 1.0
- * Much of the class structure has been provided by Udacity as a starting point for this project
- * 1. Accessors (getters & setters)
+ *
+*/
+//---------------------------------------------------------------
+
+/**
+ * @class canvasGameUnit
+ * @constructor
+ * @param {string} sprite string value of icon for canvasGameUnit 
+ * @param {number} x horizontal location of canvasGameUnit object
+ * @param {number} y vertical location of canvasGameUnit object
+ * @param {number} speed of the canvasGameUnit object
+ *
+ * NOTE:
+ * 1. This is the object from which we will 
+ * 2. Accessors (getters & setters)
  *    Prime reason for accessors is encapsulation and making future changes
  *    for example additional functionality to be added later (e.g. validation)
- * 2. Private Member variables : Whilst studing I came across private member variables 
+ * 3. Private Member variables : Whilst studing I came across private member variables 
  *     I decided to use the  _ convention to indicate private member variable
  *     I appreciate this is a crude approximation  and is cerftainly not recommended by Douglas Crockford, Javascript thought-leader 
  *     [ref-url: http://javascript.crockford.com/code.html#names]
  */
+//---------------------------------------------------------------
+
+var CanvasGameUnit = function(sprite,x,y,speed) { 
+
+    this._sprite = sprite; 
+    this._x      = x;
+    this._y      = y;
+    this._speed  = speed;
+
+    // Adding accessors to the base object, note the use of Object.defineproperty 
+    
+    Object.defineProperty(this, 'sprite', {
+	get: function () {return this._sprite;},
+	set: function (value) {this._sprite=value;}	
+    });
+    
+    Object.defineProperty(this, 'x', {
+	get: function () {return this._x; },
+	set: function (value) {this._x=value; }	
+    });
+    
+    Object.defineProperty(this, 'y', {
+	get: function () {return this._y; },
+	set: function (value) {this._y=value; }	
+    });
+
+    Object.defineProperty(this, 'speed', {
+	get: function () {return this._speed; },
+	set: function (value) {this._speed=value;}	
+    });
+
+    Object.defineProperty(this, 'loc', {
+	get: function () {return [this._x,this._y]; },
+	set: function (value1,value2) {this._x=value1;this._y=value2 }	
+    });
+
+};
+
+//---------------------------------------------------------------
+/**
+ * @description Draw the canvasGameUnit on the screen
+ * @param resources.get(this.sprite)
+ * @param {number} x : horizontal location
+ * @param {number} y : vertical location
+ */
+CanvasGameUnit.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+//---------------------------------------------------------------
+/*
+ * @description Update the CanvasGameUnit object's position. 
+ * This method be inherited and "used" directly in the Player object. Whereas with the Enemy object this have a "local" version of this method. This is an opportuity to explore polymorphism
+ * @return void
+ */
+CanvasGameUnit.prototype.update = function() {
+    // Blank
+}
+
+
 //---------------------------------------------------------------
 /**
  * @class Enemy 
@@ -19,76 +93,23 @@
  * @param {number} x horizontal location of enemy object
  * @param {number} y vertical location of enemy object
  */
-var Enemy = function(x,y) {
-    this.sprite  = 'img/enemy-bug.png'; // enemy sprite which is drawn on the canvas
+function Enemy(sprite,x,y,speed) {
 
-    this._x       = x || 0; 
-    this._y       = y || 0;  
-    this._speed   = Math.floor(Math.random() * 80) + 20; // Each enemy is initialised with a randomised speed
+    // Call the supertype contructor method from CanvasGameUnit
+    CanvasGameUnit.call(this, sprite, x, y, speed);    
 };
 
-//---------------------------------------------------------------
-/**
- * @description Set the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
- */
-Enemy.prototype.setSpeed = function(speed) {
-    this._speed  = speed;
-}
+// Fix the prototype chain to allow correct inheritance operation
+Enemy.prototype = Object.create(CanvasGameUnit.prototype); 
 
-//---------------------------------------------------------------
-/**
- * Get the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
- */
-Enemy.prototype.getSpeed = function() {
-    return this._speed;
-}
-
-//---------------------------------------------------------------
-/**
- * @description Set the enemy object sprite
- * @param {string} sprite - set the image sprite associated with this enemy object
- * @return void
- */
-Enemy.prototype.setSprite = function(sprite) {
-    this.sprite  = sprite;
-}
-
-//---------------------------------------------------------------
-/**
- * @description Get the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
- */
-Enemy.prototype.getSprite = function() {
-    return this.sprite;
-}
-
-//---------------------------------------------------------------
 /**
  * @description Update the enemy object's position. The enemy object should wrap around to the left hand side. When wraping from the right hand side to the left hand side, rather than set the x coord to 0, setting it to a negative value looks more visual pleasing. This has the visual effect of the enemy gradually moving onto the screen gradual from the left hand side rather than abructly reappearing.
  * @param {number} dt - a game engine time delta between ticks. The dt parameter
  * which will ensure the game runs at the same speed for all computers.
  * @return void
  */
-Enemy.prototype.update = function(dt) {
-    
-    (this._x > 590) ? this._x = -100 : this._x += dt* this.getSpeed(); // ternary operator
-    
-};
-
-//---------------------------------------------------------------
-/**
- * @description Draw the enemy on the screen
- * @param resources.get(this.sprite)
- * @param {number} x : horizontal location
- * @param {number} y : vertical location
- */
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this._x, this._y);
+Enemy.prototype.update = function(dt) { 
+    (this._x > 590) ? this._x = -100 : this._x += dt*this._speed; // ternary operator
 };
 
 //---------------------------------------------------------------
@@ -99,70 +120,13 @@ Enemy.prototype.render = function() {
  * @param x {number} vertical coordinate of Player object; if not supplied defaults to 400
  */
 //---------------------------------------------------------------
-Player = function(x,y) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'img/char-boy.png';
-    this._x = x || 0;
-    this._y = y || 400;
+function Player(sprite, x,y,speed) {
+    // Call the supertype contructor method from CanvasGameUnit
+    CanvasGameUnit.call(this, sprite, x, y, speed);
 };
 
-//---------------------------------------------------------------
-/**
- * @description set the x,y coordinates of the player
- * @param {number} x - horizontal location
- * @param {number} y - vertical location
- * @returns void : no return value
- */
-Player.prototype.setLocation = function(x,y) {
-    this._x = x;
-    this._y = y;
-};
-
-//---------------------------------------------------------------
-/**
- * @description set the x,y coordinates of the player
- * @param {number} x - horizontal location
- * @param {number} y - vertical location
- * @returns {number} - Players current horizontal and vertical position
- */
-Player.prototype.getLocation = function() {
-    return [this._x, this._y];
-};
-
-
-//---------------------------------------------------------------
-/**
- * @description Set the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
- */
-Player.prototype.setSpeed = function(speed) {
-    this._speed  = speed;
-}
-
-
-//---------------------------------------------------------------
-/**
- * @description set the x,y coordinates of the player
- * @returns void : no return value
- */
-Player.prototype.update = function() {
-};
-
-
-//---------------------------------------------------------------
-/**
- * @description Draw the player on the screen
- * @returns void 
- */
-//---------------------------------------------------------------
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this._x, this._y);
-};
+// Fix the prototype and correct the constructor
+Player.prototype = Object.create(CanvasGameUnit.prototype); 
 
 //---------------------------------------------------------------
 /**
@@ -190,16 +154,19 @@ Player.prototype.handleInput = function(direction) {
 
 
 //-----------------------------------------------------------------------------------
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
+// Now all the Game objects are instantiated
 
-// Create a player object
-var player = new Player(200,420);
-var allEnemies = [];
+var player = new Player('img/char-boy.png',200,420,10); // Create a player object
+
+var allEnemies = []; // Place all enemy objects in an array called allEnemies
+
+var en = null;
+
 for (var i = 0; i < 10 ; i++) {
-    en = new Enemy(0,0);
-    en._x += Math.floor(Math.random() * 500); // randomize the initial X coordinate 
-    en._y += (i%3)*83 + 60 // Place the bug on one of the three "brick lanes"
+    en         = new Enemy('img/enemy-bug.png',0,0,10);
+    en.x      += Math.floor(Math.random() * 500); // randomize the initial X coordinate 
+    en.y      += (i%3)*83 + 60 // Place the bug on one of the three "brick lanes"
+    en.speed  = Math.floor(Math.random() * 80) + 20;
     allEnemies.push(en);
 }
 
@@ -209,14 +176,14 @@ for (var i = 0; i < 10 ; i++) {
  * @return void
  */
 //---------------------------------------------------------------
-//document.addEventListener('keydown', function(e) {
-//    var allowedKeys = {
-//        37: 'left',
-//        38: 'up',
-//        39: 'right',
-//        40: 'down'
-//    };
-//    player.handleInput(allowedKeys[e.keyCode]); // interesting that there is an expectation that there is object
-//                                                // called player - very tight coupling?
-//});
+document.addEventListener('keydown', function(e) {
+    var allowedKeys = {
+        37: 'left',
+        38: 'up',
+        39: 'right',
+        40: 'down'
+    };
+    player.handleInput(allowedKeys[e.keyCode]); // interesting that there is an expectation that there is object
+                                                // called player - very tight coupling?
+});
 
