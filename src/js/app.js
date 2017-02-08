@@ -219,4 +219,4 @@ for (var i = 0; i < 10 ; i++) {
 //    player.handleInput(allowedKeys[e.keyCode]); // interesting that there is an expectation that there is object
 //                                                // called player - very tight coupling?
 //});
-//
+

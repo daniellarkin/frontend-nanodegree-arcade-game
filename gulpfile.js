@@ -1,12 +1,12 @@
-var gulp        = require('gulp');
-var express     = require('express');
-var browsersync = require('browser-sync');
-var gutil       = require('gulp-util');
-var jasmine     = require('gulp-jasmine');
-var uglify      = require('gulp-uglify');
-var shell       = require('gulp-shell');
-var istanbul    = require('gulp-istanbul');
-
+var gulp         = require('gulp');
+var express      = require('express');
+var browsersync  = require('browser-sync');
+var gutil        = require('gulp-util');
+var jasmine      = require('gulp-jasmine');
+var uglify       = require('gulp-uglify');
+var shell        = require('gulp-shell');
+var istanbul     = require('gulp-istanbul');
+const reporters  = require('jasmine-reporters');
 var server;
 var dist = 'dist';
 
@@ -15,20 +15,23 @@ var dist = 'dist';
 //-------------------------------------------------------------
 gulp.task('unit-test', function () {
   return gulp.src('./src/js/specs/*.js')
-	.pipe(jasmine())
+	.pipe(jasmine({
+	    verbose:true,
+	    //includeStackTrace: true,
+	    reporter: new reporters.JUnitXmlReporter()
+	}))
 	.pipe(istanbul.writeReports({
-	    dir: './docs/unit-test-coverage',
+	    dir: 'docs/unit-test-coverage',
 	    reporters: [ 'lcov' ],
-	    reportOpts: { dir: './docs/unit-test-coverage' }
-	})
-	     );
+	    reportOpts: { dir: './docs/unit-test-coverage'}
+	}));
 });
 
 
 //-------------------------------------------------------------
 // jsDoc
 //-------------------------------------------------------------
-gulp.task('js-doc', shell.task(['jsdoc -d docs/jsdoc/ src/js/app.js src/js/specs/app-spec.js docs/project_overview.md']));
+gulp.task('js-doc', shell.task(['jsdoc -d docs/jsdoc/ -r src/js/']));
 
 //-------------------------------------------------------------
 // BrowserSync
