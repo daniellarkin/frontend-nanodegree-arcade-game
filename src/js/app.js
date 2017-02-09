@@ -28,13 +28,15 @@
  */
 //---------------------------------------------------------------
 
-var CanvasGameUnit = function(sprite,x,y,speed) { 
+var CanvasGameUnit = function(sprite,x,y,speed,spriteWidth,spriteHeight) { 
 
-    this._sprite = sprite; 
-    this._x      = x;
-    this._y      = y;
-    this._speed  = speed;
-
+    this._sprite       = sprite; 
+    this._x            = x;
+    this._y            = y;
+    this._speed        = speed;
+    this._spriteWidth  = spriteWidth;
+    this._spriteHeight = spriteHeight;
+    
     // Adding accessors to the base object, note the use of Object.defineproperty 
     
     Object.defineProperty(this, 'sprite', {
@@ -42,6 +44,16 @@ var CanvasGameUnit = function(sprite,x,y,speed) {
 	set: function (value) {this._sprite=value;}	
     });
     
+    Object.defineProperty(this, 'spriteWidth', {
+	get: function () {return this._spriteWidth;},
+	set: function (value) {this._spriteWidth=value;}	
+    });
+
+    Object.defineProperty(this, 'spriteHeight', {
+	get: function () {return this._spriteHeight;},
+	set: function (value) {this._spriteHeight=value;}	
+    });
+
     Object.defineProperty(this, 'x', {
 	get: function () {return this._x; },
 	set: function (value) {this._x=value; }	
@@ -71,8 +83,9 @@ var CanvasGameUnit = function(sprite,x,y,speed) {
  * @param {number} x : horizontal location
  * @param {number} y : vertical location
  */
+
 CanvasGameUnit.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.spriteWidth, this.spriteHeight);
 };
 
 //---------------------------------------------------------------
@@ -85,6 +98,19 @@ CanvasGameUnit.prototype.update = function() {
     // Blank
 }
 
+//---------------------------------------------------------------
+/*
+ * @description Draw a bound box around each game unit on the canvas
+ * @return void
+ */
+
+CanvasGameUnit.prototype.boundingBox = function(x, y, width, height, color) {
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+}
 
 //---------------------------------------------------------------
 /**
@@ -93,10 +119,10 @@ CanvasGameUnit.prototype.update = function() {
  * @param {number} x horizontal location of enemy object
  * @param {number} y vertical location of enemy object
  */
-function Enemy(sprite,x,y,speed) {
+function Enemy(sprite,x,y,speed,spriteWidth,spriteHeight) {
 
     // Call the supertype contructor method from CanvasGameUnit
-    CanvasGameUnit.call(this, sprite, x, y, speed);    
+    CanvasGameUnit.call(this, sprite, x, y, speed,spriteWidth,spriteHeight);    
 };
 
 // Fix the prototype chain to allow correct inheritance operation
@@ -109,7 +135,7 @@ Enemy.prototype = Object.create(CanvasGameUnit.prototype);
  * @return void
  */
 Enemy.prototype.update = function(dt) { 
-    (this._x > 590) ? this._x = -100 : this._x += dt*this._speed; // ternary operator
+    (this.x > 590) ? this.x = -100 : this.x += dt*this.speed; // ternary operator
 };
 
 //---------------------------------------------------------------
@@ -120,9 +146,9 @@ Enemy.prototype.update = function(dt) {
  * @param x {number} vertical coordinate of Player object; if not supplied defaults to 400
  */
 //---------------------------------------------------------------
-function Player(sprite, x,y,speed) {
+function Player(sprite, x,y,speed,spriteWidth,spriteHeight) {
     // Call the supertype contructor method from CanvasGameUnit
-    CanvasGameUnit.call(this, sprite, x, y, speed);
+    CanvasGameUnit.call(this, sprite, x, y, speed,spriteWidth,spriteHeight);
 };
 
 // Fix the prototype and correct the constructor
@@ -153,21 +179,59 @@ Player.prototype.handleInput = function(direction) {
 };
 
 
+//---------------------------------------------------------------
+/**
+ * @class Gem
+ * @constructor
+ * @param x {number} horizontal coordinate of Player object; if not supplied defaults to 0
+ * @param x {number} vertical coordinate of Player object; if not supplied defaults to 400
+ */
+//---------------------------------------------------------------
+function Gem(sprite, x,y,speed,spriteWidth,spriteHeight) {
+    // Call the supertype contructor method from CanvasGameUnit
+    CanvasGameUnit.call(this, sprite, x, y, speed,spriteWidth,spriteHeight);
+};
+
+// Fix the prototype and correct the constructor
+Gem.prototype = Object.create(CanvasGameUnit.prototype); 
+
+
+
 //-----------------------------------------------------------------------------------
 // Now all the Game objects are instantiated
 
-var player = new Player('img/char-boy.png',200,420,10); // Create a player object
+var player = new Player('img/char-boy.png',200,420,10,100,171); // Create a player object
 
 var allEnemies = []; // Place all enemy objects in an array called allEnemies
 
-var en = null;
+var allGems = []; // Place all gems objects in an array called allGems
 
-for (var i = 0; i < 10 ; i++) {
-    en         = new Enemy('img/enemy-bug.png',0,0,10);
-    en.x      += Math.floor(Math.random() * 500); // randomize the initial X coordinate 
-    en.y      += (i%3)*83 + 60 // Place the bug on one of the three "brick lanes"
-    en.speed  = Math.floor(Math.random() * 80) + 20;
+var en,gem = null;
+var scale;
+
+//player.boundingBox(this.x,this.y, 100,100,'red');
+
+for (var i = 0; i < 1; i++) { 
+    scale      = (Math.random()*0.5)+0.5;
+    en         = new Enemy('img/enemy-bug.png',0,0,0, 101*scale, 171*scale);
+    en.x       = Math.floor(Math.random() * 500); // randomize the initial X coordinate 
+    en.y       = (130 + (i%3)*85) - 70*scale; // Place the bug on one of the three "brick lanes"
+    en.speed   = Math.floor(Math.random() * 80) + 20;
     allEnemies.push(en);
+}
+
+
+// Randomly add Gems
+// TBD: increase the number of gems as the game progresses
+for (var i = 0; i < 3 ; i++) {
+    var gemIcons   = ["img/Gem\ Orange.png",
+		      "img/Gem\ Green.png",
+		      "img/Gem\ Blue.png"];	
+    gem        =  new Gem(gemIcons[Math.floor(Math.random() * gemIcons.length)],0,0,0,101,171);
+    gem.x      += Math.floor(Math.random() * 400); // randomize the initial X coordinate 
+    gem.y      += Math.floor(Math.random() * 400);  // randomize the initial Y coordinate 
+    gem.speed  = 0; // Gems don't move 
+    allGems.push(gem);
 }
 
 //---------------------------------------------------------------

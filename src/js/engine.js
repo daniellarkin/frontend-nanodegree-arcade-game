@@ -80,7 +80,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        //checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -94,9 +94,25 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+        allGems.forEach(function(gem) {
+            gem.update(dt);
+        });
         player.update();
     }
 
+
+    //---------------------------------------------------------------
+    /**
+     * checkCollisions
+     * @description This method checks if the player and any enemy have collided
+     * @return void
+     */
+    //---------------------------------------------------------------
+    function checkCollisions() {
+	
+    }
+
+    
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
@@ -143,15 +159,32 @@ var Engine = (function(global) {
      * tick. Its purpose is to then call the render functions you have defined
      * on your enemy and player entities within app.js
      */
+    var frmCnt=0;
     function renderEntities() {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
+
+        allGems.forEach(function(gem) {
+            gem.render();
+        });
+
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-
+	
         player.render();
+	//player.boundingBox(this.x,this.y, 100,100,'red');
+
+	frmCnt++;
+	if (frmCnt%300==0 && allEnemies.length<15) {
+	    scale      = (Math.random()*0.5)+0.5;
+	    en         = new Enemy('img/enemy-bug.png',0,0,0, 101*scale, 171*scale);
+	    en.x       = -100; // randomize the initial X coordinate 
+	    en.y       = (130 + (allEnemies.length%3)*85) - 70*scale; // Place the bug on one of the three "brick lanes"
+	    en.speed   = Math.floor(Math.random() * 80) + 20;
+	    allEnemies.push(en);
+	}
     }
 
     /* This function does nothing but it could have been a good place to
@@ -165,8 +198,11 @@ var Engine = (function(global) {
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.
-     */
+     */    
     Resources.load([
+        "img/Gem\ Orange.png",
+        "img/Gem\ Green.png",
+	"img/Gem\ Blue.png",	
         'img/stone-block.png',
         'img/water-block.png',
         'img/grass-block.png',
