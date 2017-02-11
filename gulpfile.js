@@ -7,8 +7,39 @@ var uglify       = require('gulp-uglify');
 var shell        = require('gulp-shell');
 var istanbul     = require('gulp-istanbul');
 const reporters  = require('jasmine-reporters');
+var aws   = require('gulp-awspublish');
+var fs = require('fs');
 var server;
 var dist = 'dist';
+
+//-------------------------------------------------------------
+// Deploy to AWS S3 static website hosting
+//-------------------------------------------------------------
+gulp.task('deploy', function() {
+
+    var publisher = aws.create({
+	region: 'us-east-1',
+	params: {
+	    'Bucket': 'udaarcade'
+	},
+	accessKeyId: "AKIAJKNXI4RHCGV4GDLQ",
+	secretAccessKey: "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"
+    }, {
+	cacheFileName: 'aws_s3.cache'
+    });
+
+    var headers = {
+	'Cache-Control': 'max-age=315360000, no-transform, public'
+    };
+
+    return gulp.src( './dist/**/*' )
+	.pipe(publisher.publish(headers))
+	  //.pipe(publisher.sync())
+	  .pipe(publisher.cache())
+	.pipe(aws.reporter());
+
+});
+ 
 
 //-------------------------------------------------------------
 // Jasmine JS unit testing
@@ -49,6 +80,7 @@ function reload() {
 gulp.task('cp-html', function(){
 
     return gulp.src(['src/index.html',
+		     'src/*.json',
 		     'src/html/**/*.html'])
 	.pipe(gulp.dest('dist'))
 	.pipe(reload());
@@ -72,7 +104,8 @@ gulp.task('cp-css', function(){
 //-------------------------------------------------------------
 gulp.task('cp-js', function(){
     return gulp
-    .src(['./src/js/**/*.js'])
+	.src(['./src/js/**/*.js',
+	      '!./src/js/specs/*'])
 	.pipe(gulp.dest('dist/js'))
     	.pipe(reload());
 });
