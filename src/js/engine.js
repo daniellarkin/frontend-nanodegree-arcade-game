@@ -33,6 +33,7 @@ var Engine = (function(global) {
      * and handles properly calling the update and render methods.
      */
     function main() {
+
         /* Get our time delta information which is required if your game
          * requires smooth animation. Because everyone's computer processes
          * instructions at different speeds we need a constant value that
@@ -79,8 +80,27 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
-        checkCollisions();
+      updateEntities(dt);
+	    allEnemies.forEach(function(e) {
+	      checkCollisions(player,e);
+	    })
+	
+	    ctx.font = "30px Calibri";
+	    ctx.clearRect(0, 0, 550, 50);
+	
+	    var s="0"+player.score;
+	    while (s.length < 6) s = "0" + s;
+	    ctx.fillText('SCORE:'+s,325,40);
+	    var highScore;
+	    
+	    // Retrieve the high score for the server via an ajax call
+	    $.getJSON("highScoreData.json", function (data) {
+	      //console.log('highscore is '+data.highScore);
+	      player.highScore = data.highScore;
+	    });
+	    
+	    ctx.fillText('HIGHSCORE:'+player.highScore,0,40);
+    
     }
 
     /* This is called by the update function and loops through all of the
@@ -108,8 +128,39 @@ var Engine = (function(global) {
      * @return void
      */
     //---------------------------------------------------------------
-    function checkCollisions() {
-	
+    function checkCollisions(obj1,obj2) {
+        spriteWidth  = 101;
+        spriteHeight = 171;
+        var x1      = obj1.x+20;
+        var y1      = obj1.y+70;
+        var width1  = 48;
+        var height1 = 65;
+
+	      var x2      = obj2.x+obj2.offsetX*obj2.scale;
+	      var y2      = obj2.y+obj2.offsetY*obj2.scale;
+	      var width2  = obj2.actualWidth*obj2.scale;
+	      var height2 = obj2.actualHeight*obj2.scale;
+
+	      //obj1.debugBoundingBox = false;
+	      //obj2.debugboundingBox = false;
+	      //obj1.debugColour = "blue";
+	      //obj2.debugColour = "blue";
+
+	      if (x1 < x2 + width2 &&
+	          x1 + width1 > x2 &&
+	          y1 < y2 + height2 &&
+	          height1 + y1 > y2){
+	          //console.log("!!COLLISON!!");
+	          //obj1.debugColour = "red";
+	          //obj2.debugColour = "red";
+	          //obj1.debugBoundingBox = true;
+	          //obj2.debugBoundingBox = true;
+	          reset();
+	          return true;
+	      }
+	      else {
+	          return false;
+	      }
     }
 
     
@@ -151,7 +202,7 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
-
+	
         renderEntities();
     }
 
@@ -164,7 +215,6 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-
         allGems.forEach(function(gem) {
             gem.render();
         });
@@ -174,18 +224,17 @@ var Engine = (function(global) {
         });
 	
         player.render();
-	//player.boundingBox(this.x,this.y, 100,100,'red');
 
-	frmCnt++;
-	if (frmCnt%300==0 && allEnemies.length<15) {
-	    scale      = (Math.random()*0.5)+0.5;
-	    en         = new Enemy('img/enemy-bug.png',0,0,0, 101*scale, 171*scale);
-	    en.x       = -100; // randomize the initial X coordinate 
-	    en.y       = (130 + (allEnemies.length%3)*85) - 70*scale; // Place the bug on one of the three "brick lanes"
-	    en.speed   = Math.floor(Math.random() * 80) + 20;
-	    allEnemies.push(en);
-	}
-    }
+	      frmCnt++;
+	      if (frmCnt%300===0 && allEnemies.length<15) {
+	          scale      = (Math.random()*0.5)+0.5;
+	          en         = new Enemy('img/enemy-bug.png',0,0,0, 101*scale, 171*scale, scale,12*scale,80*scale,75*scale, 60*scale,false);
+	          en.x       = -100;
+	          en.y       = (84 + (allEnemies.length%3)*85); // Place the bug on one of the three "brick lanes"
+	          en.speed   = Math.floor(Math.random() * 80) + 20;
+	          allEnemies.push(en);
+	      }
+     }
 
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
@@ -193,16 +242,23 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+	      if (player.score>10) {
+	          player.score -=10;
+	      }
+	      player.x = 200;
+	      player.y = 420;
+
+	      //TBD a smoother game transition would be nicer
     }
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.
-     */    
+     */
     Resources.load([
         "img/Gem\ Orange.png",
         "img/Gem\ Green.png",
-	"img/Gem\ Blue.png",	
+	      "img/Gem\ Blue.png",
         'img/stone-block.png',
         'img/water-block.png',
         'img/grass-block.png',
