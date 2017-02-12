@@ -13,9 +13,9 @@ Aside from the requirements of the [rubric](https://review.udacity.com/#!/projec
 8. Read up on npm vs bower; it seems the general conclusion is that bower is some what redunant with npm 3. In subsequent projects I'll consider migrating fully to npm. 
 
 9. Game related features:
-* enemies increases as the game time increases , up to a maximum number of 15
-* enemies sprites are randomly scaled between 50%-100%
-* scoreboard logic added to canvas
-* high score retrieved using jQuery getJson (wrapper for ajax) call. To store new high scores it probably would be best to use a database driven solution on the server side.
-* Used base and "derived" objects to explore object oriented concepts such as inheritance, polyphorism and encapsultion (via accesor pattern)
+- enemies increases as the game time increases , up to a maximum number of 15
+- enemies sprites are randomly scaled between 50%-100%
+- scoreboard logic added to canvas
+- high score retrieved using jQuery getJson (wrapper for ajax) call. To store new high scores it probably would be best to use a database driven solution on the server side.
+- Used base and "derived" objects to explore object oriented concepts such as inheritance, polyphorism and encapsultion (via accesor pattern)
 
