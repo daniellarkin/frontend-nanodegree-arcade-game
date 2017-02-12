@@ -17,7 +17,7 @@
  * @param {number} speed of the canvasGameUnit object
  *
  * NOTE:
- * 1. This is the object from which we will
+ * 1. This is the object from which we will inherited objects for player and enemies
  * 2. Accessors (getters & setters)
  *    Prime reason for accessors is encapsulation and making future changes
  *    for example additional functionality to be added later (e.g. validation)
@@ -37,16 +37,15 @@ var CanvasGameUnit = function(sprite,x,y,speed,spriteWidth,spriteHeight, offsetX
     this._spriteWidth     = spriteWidth;
     this._spriteHeight    = spriteHeight;
 
+    // While I did experimented with accessors I also used regular properties as well
     this.debugBoundingBox = debugBB;
     this.offsetX          = offsetX;
     this.offsetY          = offsetY;
     this.actualWidth      = actualWidth;
     this.actualHeight     = actualHeight;
-    
     this.debugColour      = "blue";
     
-    // Adding accessors to the base object, note the use of Object.defineproperty
-    
+    // Adding accessors to the base object, note the use of Object.defineproperty    
     Object.defineProperty(this, 'sprite', {
 	    get: function () {return this._sprite;},
 	    set: function (value) {this._sprite=value;}
@@ -86,12 +85,13 @@ var CanvasGameUnit = function(sprite,x,y,speed,spriteWidth,spriteHeight, offsetX
 
 //---------------------------------------------------------------
 /**
- * @description Draw the canvasGameUnit on the screen
+ * @description Draw the canvasGameUnit on the screen. If the object property <em>debugBoundingBox</em> is enabled a bounding box is drawn around each object. This is helpful for debugging any issues collision logic. 
  * @param resources.get(this.sprite)
  * @param {number} x : horizontal location
  * @param {number} y : vertical location
+ * @param {number} spriteWidth : Sprite width, including any transparent regions
+ * @param {number} spriteHeight : sprite height, including any transparent regions
  */
-
 CanvasGameUnit.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.spriteWidth, this.spriteHeight);
 
@@ -107,7 +107,7 @@ CanvasGameUnit.prototype.render = function() {
 //---------------------------------------------------------------
 /*
  * @description Update the CanvasGameUnit object's position.
- * This method be inherited and "used" directly in the Player object. Whereas with the Enemy object this have a "local" version of this method. This is an opportuity to explore polymorphism
+ * This method be inherited and "used" directly in the Player object. Whereas with the Enemy object this have a "local" version of this method. This is an opportuity to demonstrate polymorphism
  * @return void
  */
 CanvasGameUnit.prototype.update = function() {
@@ -125,7 +125,7 @@ function Enemy(sprite,x,y,speed,spriteWidth,spriteHeight,scale, offsetX,offsetY,
 
     // Call the supertype contructor method from CanvasGameUnit
     CanvasGameUnit.call(this, sprite, x ,y, speed,spriteWidth,spriteHeight, offsetX,offsetY, actualWidth, actualHeight, debugBB)
-    this.scale = scale;
+    this.scale = scale; // the enemy sprites can be scaled while adding to the canvas. This scaling factor must be recorded for us with collision and bounding box logic
 }
 
 // Fix the prototype chain to allow correct inheritance operation
@@ -152,6 +152,8 @@ Enemy.prototype.update = function(dt) {
 function Player(sprite, x,y,speed,spriteWidth,spriteHeight,offsetX,offsetY, actualWidth, actualHeight, debugBB){
     // Call the supertype contructor method from CanvasGameUnit
     CanvasGameUnit.call(this, sprite, x ,y, speed,spriteWidth,spriteHeight, offsetX,offsetY, actualWidth, actualHeight, debugBB);
+
+    // Scoring related variables
     this.score = 0;
     this.zone;
     this.oldZone;
@@ -185,6 +187,14 @@ Player.prototype.handleInput = function(direction) {
     }
 };
 
+/**
+ * @description Draw the player on screen. The logic relating to scoring is included in this method 
+ * @param resources.get(this.sprite)
+ * @param {number} x : horizontal location
+ * @param {number} y : vertical location
+ * @param {number} spriteWidth : Sprite width, including any transparent regions
+ * @param {number} spriteHeight : sprite height, including any transparent regions
+ */
 
 Player.prototype.render = function(direction) {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.spriteWidth, this.spriteHeight);
@@ -225,10 +235,9 @@ function Gem(sprite, x,y,speed,spriteWidth,spriteHeight) {
 Gem.prototype = Object.create(CanvasGameUnit.prototype);
 
 
-
 //-----------------------------------------------------------------------------------
-// Now all the Game objects are instantiated
-// Global variables
+// Now all the Game objects should be instantiated
+// Note these are global variables
 
 var player = new Player('img/char-boy.png',200,420,10,100,171,20,60,60,80,false); // Create a player object
 var allEnemies = []; // Place all enemy objects in an array called allEnemies
@@ -237,7 +246,8 @@ var en,gem = null;
 var scale;
 
 
-for (var i = 0; i < 1; i++) {
+// Create initial array of enemy objects. I have added logic within the engine.js file to add enemies to the allEnemy array as the game time progresses
+for (var i = 0; i < 2; i++) {
     scale      = (Math.random()*0.5)+0.5;
     en         = new Enemy('img/enemy-bug.png',0,0,0, 101*scale, 171*scale, scale,12*scale,80*scale,75*scale, 60*scale,false);;
     en.x       = Math.floor(Math.random() * 500); // randomize the initial X coordinate
@@ -248,7 +258,8 @@ for (var i = 0; i < 1; i++) {
 
 
 // Randomly add Gems
-// TBD: increase the number of gems as the game progresses
+// TBD1: increase the number of gems as the game progresses
+// TBD2: reuse the collision detection logic to allow the player to collect the gems and score points
 for (var i = 0; i < 3 ; i++) {
     var gemIcons   = ["img/Gem\ Orange.png",
 		      "img/Gem\ Green.png",
