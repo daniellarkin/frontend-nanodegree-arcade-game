@@ -22,8 +22,6 @@ gulp.task('deploy', function() {
 	params: {
 	    'Bucket': 'udaarcade'
 	},
-	accessKeyId: "AKIAJKNXI4RHCGV4GDLQ",
-	secretAccessKey: "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"
     }, {
 	cacheFileName: 'aws_s3.cache'
     });
