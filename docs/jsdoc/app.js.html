@@ -26,76 +26,139 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>//---------------------------------------------------------------
+            <pre class="prettyprint source linenums"><code>"use strict";
+//---------------------------------------------------------------
 /**
  *
  * @author Daniel Larkin
  * @version 1.0
- * Much of the class structure has been provided by Udacity as a starting point for this project
- * 1. Accessors (getters &amp; setters)
+ *
+*/
+//---------------------------------------------------------------
+
+/**
+ * @class canvasGameUnit
+ * @constructor
+ * @param {string} sprite string value of icon for canvasGameUnit
+ * @param {number} x horizontal location of canvasGameUnit object
+ * @param {number} y vertical location of canvasGameUnit object
+ * @param {number} speed of the canvasGameUnit object
+ *
+ * NOTE:
+ * 1. This is the object from which we will inherited objects for player and enemies
+ * 2. Accessors (getters &amp; setters)
  *    Prime reason for accessors is encapsulation and making future changes
  *    for example additional functionality to be added later (e.g. validation)
- * 2. Private Member variables : Whilst studing I came across private member variables 
+ * 3. Private Member variables : Whilst studing I came across private member variables
  *     I decided to use the  _ convention to indicate private member variable
- *     I appreciate this is a crude approximation  and is cerftainly not recommended by Douglas Crockford, Javascript thought-leader 
+ *     I appreciate this is a crude approximation  and is cerftainly not recommended by Douglas Crockford, Javascript thought-leader
  *     [ref-url: http://javascript.crockford.com/code.html#names]
  */
 //---------------------------------------------------------------
-/**
- * @class Enemy 
- * @constructor
- * @param {number} x horizontal location of enemy object
- * @param {number} y vertical location of enemy object
- */
-var Enemy = function(x,y) {
-    this.sprite  = 'img/enemy-bug.png'; // enemy sprite which is drawn on the canvas
 
-    this._x       = x || 0; 
-    this._y       = y || 0;  
-    this._speed   = Math.floor(Math.random() * 80) + 20; // Each enemy is initialised with a randomised speed
+var CanvasGameUnit = function(sprite,x,y,speed,spriteWidth,spriteHeight, offsetX,offsetY, actualWidth, actualHeight, debugBB) {
+
+    this._sprite          = sprite;
+    this._x               = x;
+    this._y               = y;
+    this._speed           = speed;
+    this._spriteWidth     = spriteWidth;
+    this._spriteHeight    = spriteHeight;
+
+    // While I did experimented with accessors I also used regular properties as well
+    this.debugBoundingBox = debugBB;
+    this.offsetX          = offsetX;
+    this.offsetY          = offsetY;
+    this.actualWidth      = actualWidth;
+    this.actualHeight     = actualHeight;
+    this.debugColour      = "blue";
+    
+    // Adding accessors to the base object, note the use of Object.defineproperty    
+    Object.defineProperty(this, 'sprite', {
+	    get: function () {return this._sprite;},
+	    set: function (value) {this._sprite=value;}
+    });
+    
+    Object.defineProperty(this, 'spriteWidth', {
+	    get: function () {return this._spriteWidth;},
+	    set: function (value) {this._spriteWidth=value;}
+    });
+
+    Object.defineProperty(this, 'spriteHeight', {
+	    get: function () {return this._spriteHeight;},
+	    set: function (value) {this._spriteHeight=value;}
+    });
+
+    Object.defineProperty(this, 'x', {
+	    get: function () {return this._x; },
+	    set: function (value) {this._x=value; }
+    });
+    
+    Object.defineProperty(this, 'y', {
+	    get: function () {return this._y; },
+	    set: function (value) {this._y=value; }
+    });
+
+    Object.defineProperty(this, 'speed', {
+	    get: function () {return this._speed; },
+	    set: function (value) {this._speed=value;}
+    });
+
+    Object.defineProperty(this, 'loc', {
+	    get: function () {return [this._x,this._y]; },
+	    set: function (value1,value2) {this._x=value1;this._y=value2 }
+    });
+
 };
 
 //---------------------------------------------------------------
 /**
- * @description Set the enemy object speed
- * @param {number} speed - desired speed of the enemy object
+ * @description Draw the canvasGameUnit on the screen. If the object property &lt;em>debugBoundingBox&lt;/em> is enabled a bounding box is drawn around each object. This is helpful for debugging any issues collision logic. 
+ * @param resources.get(this.sprite)
+ * @param {number} x : horizontal location
+ * @param {number} y : vertical location
+ * @param {number} spriteWidth : Sprite width, including any transparent regions
+ * @param {number} spriteHeight : sprite height, including any transparent regions
+ */
+CanvasGameUnit.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.spriteWidth, this.spriteHeight);
+
+    if (this.debugBoundingBox){
+	    ctx.beginPath();
+	    ctx.rect(this.x+this.offsetX*this.scale, this.y+this.offsetY*this.scale, this.actualWidth*this.scale, this.actualHeight*this.scale);
+	    ctx.lineWidth = 2;
+	    ctx.strokeStyle = this.debugColour;
+	    ctx.stroke();
+    }
+};
+
+//---------------------------------------------------------------
+/*
+ * @description Update the CanvasGameUnit object's position.
+ * This method be inherited and "used" directly in the Player object. Whereas with the Enemy object this have a "local" version of this method. This is an opportuity to demonstrate polymorphism
  * @return void
  */
-Enemy.prototype.setSpeed = function(speed) {
-    this._speed  = speed;
+CanvasGameUnit.prototype.update = function() {
+    // Blank
 }
 
 //---------------------------------------------------------------
 /**
- * Get the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
+ * @class Enemy
+ * @constructor
+ * @param {number} x horizontal location of enemy object
+ * @param {number} y vertical location of enemy object
  */
-Enemy.prototype.getSpeed = function() {
-    return this._speed;
+function Enemy(sprite,x,y,speed,spriteWidth,spriteHeight,scale, offsetX,offsetY, actualWidth, actualHeight, debugBB) {
+
+    // Call the supertype contructor method from CanvasGameUnit
+    CanvasGameUnit.call(this, sprite, x ,y, speed,spriteWidth,spriteHeight, offsetX,offsetY, actualWidth, actualHeight, debugBB)
+    this.scale = scale; // the enemy sprites can be scaled while adding to the canvas. This scaling factor must be recorded for us with collision and bounding box logic
 }
 
-//---------------------------------------------------------------
-/**
- * @description Set the enemy object sprite
- * @param {string} sprite - set the image sprite associated with this enemy object
- * @return void
- */
-Enemy.prototype.setSprite = function(sprite) {
-    this.sprite  = sprite;
-}
+// Fix the prototype chain to allow correct inheritance operation
+Enemy.prototype = Object.create(CanvasGameUnit.prototype);
 
-//---------------------------------------------------------------
-/**
- * @description Get the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
- */
-Enemy.prototype.getSprite = function() {
-    return this.sprite;
-}
-
-//---------------------------------------------------------------
 /**
  * @description Update the enemy object's position. The enemy object should wrap around to the left hand side. When wraping from the right hand side to the left hand side, rather than set the x coord to 0, setting it to a negative value looks more visual pleasing. This has the visual effect of the enemy gradually moving onto the screen gradual from the left hand side rather than abructly reappearing.
  * @param {number} dt - a game engine time delta between ticks. The dt parameter
@@ -103,20 +166,7 @@ Enemy.prototype.getSprite = function() {
  * @return void
  */
 Enemy.prototype.update = function(dt) {
-    
-    (this._x > 590) ? this._x = -100 : this._x += dt* this.getSpeed(); // ternary operator
-    
-};
-
-//---------------------------------------------------------------
-/**
- * @description Draw the enemy on the screen
- * @param resources.get(this.sprite)
- * @param {number} x : horizontal location
- * @param {number} y : vertical location
- */
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this._x, this._y);
+    (this.x > 590) ? this.x = -100 : this.x += dt*this.speed; // ternary operator
 };
 
 //---------------------------------------------------------------
@@ -127,70 +177,19 @@ Enemy.prototype.render = function() {
  * @param x {number} vertical coordinate of Player object; if not supplied defaults to 400
  */
 //---------------------------------------------------------------
-Player = function(x,y) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+function Player(sprite, x,y,speed,spriteWidth,spriteHeight,offsetX,offsetY, actualWidth, actualHeight, debugBB){
+    // Call the supertype contructor method from CanvasGameUnit
+    CanvasGameUnit.call(this, sprite, x ,y, speed,spriteWidth,spriteHeight, offsetX,offsetY, actualWidth, actualHeight, debugBB);
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'img/char-boy.png';
-    this._x = x || 0;
-    this._y = y || 400;
-};
-
-//---------------------------------------------------------------
-/**
- * @description set the x,y coordinates of the player
- * @param {number} x - horizontal location
- * @param {number} y - vertical location
- * @returns void : no return value
- */
-Player.prototype.setLocation = function(x,y) {
-    this._x = x;
-    this._y = y;
-};
-
-//---------------------------------------------------------------
-/**
- * @description set the x,y coordinates of the player
- * @param {number} x - horizontal location
- * @param {number} y - vertical location
- * @returns {number} - Players current horizontal and vertical position
- */
-Player.prototype.getLocation = function() {
-    return [this._x, this._y];
-};
-
-
-//---------------------------------------------------------------
-/**
- * @description Set the enemy object speed
- * @param {number} speed - desired speed of the enemy object
- * @return void
- */
-Player.prototype.setSpeed = function(speed) {
-    this._speed  = speed;
+    // Scoring related variables
+    this.score = 0;
+    this.zone;
+    this.oldZone;
+    this.highScore=0;
 }
 
-
-//---------------------------------------------------------------
-/**
- * @description set the x,y coordinates of the player
- * @returns void : no return value
- */
-Player.prototype.update = function() {
-};
-
-
-//---------------------------------------------------------------
-/**
- * @description Draw the player on the screen
- * @returns void 
- */
-//---------------------------------------------------------------
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this._x, this._y);
-};
+// Fix the prototype and correct the constructor
+Player.prototype = Object.create(CanvasGameUnit.prototype);
 
 //---------------------------------------------------------------
 /**
@@ -216,19 +215,88 @@ Player.prototype.handleInput = function(direction) {
     }
 };
 
+/**
+ * @description Draw the player on screen. The logic relating to scoring is included in this method 
+ * @param resources.get(this.sprite)
+ * @param {number} x : horizontal location
+ * @param {number} y : vertical location
+ * @param {number} spriteWidth : Sprite width, including any transparent regions
+ * @param {number} spriteHeight : sprite height, including any transparent regions
+ */
+
+Player.prototype.render = function(direction) {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.spriteWidth, this.spriteHeight);
+
+    if (this.y &lt; 10){
+	    this.zone ="winZone";
+    }
+    else if (this.y >= 10 &amp;&amp; this.y&lt; 280){
+	    this.zone ="battleZone";
+    }
+    else {
+	    this.zone ="safeZone";
+    }
+
+    if (this.oldZone == "battleZone" &amp;&amp; this.zone=="winZone"){
+	    this.score+=10;
+	    this.x = 200;
+	    this.y =420;
+    }
+
+    this.oldZone = this.zone;
+}
+
+//---------------------------------------------------------------
+/**
+ * @class Gem
+ * @constructor
+ * @param x {number} horizontal coordinate of Player object; if not supplied defaults to 0
+ * @param x {number} vertical coordinate of Player object; if not supplied defaults to 400
+ */
+//---------------------------------------------------------------
+function Gem(sprite, x,y,speed,spriteWidth,spriteHeight) {
+    // Call the supertype contructor method from CanvasGameUnit
+    CanvasGameUnit.call(this, sprite, x, y, speed,spriteWidth,spriteHeight);
+}
+
+// Fix the prototype and correct the constructor
+Gem.prototype = Object.create(CanvasGameUnit.prototype);
+
 
 //-----------------------------------------------------------------------------------
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
+// Now all the Game objects should be instantiated
+// Note these are global variables
 
-// Create a player object
-var player = new Player(200,420);
-var allEnemies = [];
-for (var i = 0; i &lt; 10 ; i++) {
-    en = new Enemy(0,0);
-    en._x += Math.floor(Math.random() * 500); // randomize the initial X coordinate 
-    en._y += (i%3)*83 + 60 // Place the bug on one of the three "brick lanes"
+var player = new Player('img/char-boy.png',200,420,10,100,171,20,60,60,80,false); // Create a player object
+var allEnemies = []; // Place all enemy objects in an array called allEnemies
+var allGems = []; // Place all gems objects in an array called allGems
+var en,gem = null;
+var scale;
+
+
+// Create initial array of enemy objects. I have added logic within the engine.js file to add enemies to the allEnemy array as the game time progresses
+for (var i = 0; i &lt; 2; i++) {
+    scale      = (Math.random()*0.5)+0.5;
+    en         = new Enemy('img/enemy-bug.png',0,0,0, 101*scale, 171*scale, scale,12*scale,80*scale,75*scale, 60*scale,false);;
+    en.x       = Math.floor(Math.random() * 500); // randomize the initial X coordinate
+    en.y       = (84 + (i%3)*85); // Place the bug on one of the three "brick lanes"
+    en.speed   = Math.floor(Math.random() * 80) + 20;
     allEnemies.push(en);
+}
+
+
+// Randomly add Gems
+// TBD1: increase the number of gems as the game progresses
+// TBD2: reuse the collision detection logic to allow the player to collect the gems and score points
+for (var i = 0; i &lt; 3 ; i++) {
+    var gemIcons   = ["img/Gem\ Orange.png",
+		      "img/Gem\ Green.png",
+		      "img/Gem\ Blue.png"];
+    gem        =  new Gem(gemIcons[Math.floor(Math.random() * gemIcons.length)],0,0,0,101,171);
+    gem.x      += Math.floor(Math.random() * 400); // randomize the initial X coordinate
+    gem.y      += Math.floor(Math.random() * 400);  // randomize the initial Y coordinate
+    gem.speed  = 0; // Gems don't move
+    allGems.push(gem);
 }
 
 //---------------------------------------------------------------
@@ -244,8 +312,7 @@ document.addEventListener('keydown', function(e) {
         39: 'right',
         40: 'down'
     };
-    player.handleInput(allowedKeys[e.keyCode]); // interesting that there is an expectation that there is object
-                                                // called player - very tight coupling?
+    player.handleInput(allowedKeys[e.keyCode]);
 });
 
 </code></pre>
@@ -258,13 +325,13 @@ document.addEventListener('keydown', function(e) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Enemy.html">Enemy</a></li><li><a href="Player.html">Player</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CanvasGameUnit.html">CanvasGameUnit</a></li><li><a href="Enemy.html">Enemy</a></li><li><a href="Gem.html">Gem</a></li><li><a href="Player.html">Player</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Jan 31 2017 18:39:50 GMT+0000 (GMT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Feb 12 2017 15:36:02 GMT+0000 (GMT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,6 +1,21 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this [rubric](https://review.udacity.com/#!/projects/2696458597/rubric) for self-checking their submission. Make sure the functions you write are **object-oriented** - either class functions (like Player and Enemy) or class prototype functions such as Enemy.prototype.checkCollisions, and that the keyword 'this' is used appropriately within your class and class prototype functions to refer to the object the function is called upon. Also be sure that the **readme.md** file is updated with your instructions on both how to 1. Run and 2. Play your arcade game.
+Aside from the requirements of the [rubric](https://review.udacity.com/#!/projects/2696458597/rubric), I also did the following:
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+1. gulp task for jsDoc; special comments are extracted from app.js. I looked at doxygen as well, but jsDoc seems to have more widespread usage. 
+2. gulp task for AWS s3 deployment. I wanted a free remote hosting option (other than github pages which I've already setup for www.purergb.com).I settled on using AWS s3. This is straight-forward to setup and allows a quick deployment from gulp (typical 3-5 seconds for small updates once files are cached).
+3. Investigated Javascript unit testing via Jasmine. Attempted to translate the rubric into a behaviour driven development plan. This is available in src/js/specs/ - remains a work in progress. Learnt a huge amount from exploring unit testing at this stage.
+4. Set up gulp based jasmine
+5. Investigated code coverage using a gulp plugin for Istanbul
+6. Investigated a "headless" Jasmine flow via phantomJS. This remains a work in progress, as experience challenges compiling from phantomJS and associated dependancies on my ARM v7
+7. Added .bowerrc file and change the default directory. Now everything is self contained within the src directory. This makes it easier when generating the dist release.
+8. Read up on npm vs bower; it seems the general conclusion is that bower is some what redunant with npm 3. In subsequent projects I'll consider migrating fully to npm. 
+
+9. Game related features:
+9.1 enemies increases as the game time increases , up to a maximum number of 15
+9.2 enemies sprites are randomly scaled between 50%-100%
+9.3 scoreboard logic added to canvas
+9.4 high score retrieved using jQuery getJson (wrapper for ajax) call. To store new high scores it probably would be best to use a database driven solution on the server side.
+9.5 Used base and "derived" objects to explore object oriented concepts such as inheritance, polyphorism and encapsultion (via accesor pattern)
+

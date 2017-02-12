@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Player</title>
+    <title>JSDoc: Class: CanvasGameUnit</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Player</h1>
+    <h1 class="page-title">Class: CanvasGameUnit</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2>Player</h2>
+        <h2>CanvasGameUnit</h2>
         
-            <div class="class-description">Player</div>
+            <div class="class-description">canvasGameUnit</div>
         
     
 </header>
@@ -44,7 +44,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="Player"><span class="type-signature"></span>new Player<span class="signature">(x, x)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="CanvasGameUnit"><span class="type-signature"></span>new CanvasGameUnit<span class="signature">(sprite, x, y, speed)</span><span class="type-signature"></span></h4>
 
     
 
@@ -83,13 +83,13 @@
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>sprite</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
             
@@ -99,7 +99,7 @@
 
             
 
-            <td class="description last">horizontal coordinate of Player object; if not supplied defaults to 0</td>
+            <td class="description last">string value of icon for canvasGameUnit</td>
         </tr>
 
     
@@ -122,7 +122,63 @@
 
             
 
-            <td class="description last">vertical coordinate of Player object; if not supplied defaults to 400</td>
+            <td class="description last">horizontal location of canvasGameUnit object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">vertical location of canvasGameUnit object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>speed</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">of the canvasGameUnit object
+
+NOTE:
+1. This is the object from which we will inherited objects for player and enemies
+2. Accessors (getters & setters)
+   Prime reason for accessors is encapsulation and making future changes
+   for example additional functionality to be added later (e.g. validation)
+3. Private Member variables : Whilst studing I came across private member variables
+    I decided to use the  _ convention to indicate private member variable
+    I appreciate this is a crude approximation  and is cerftainly not recommended by Douglas Crockford, Javascript thought-leader
+    [ref-url: http://javascript.crockford.com/code.html#names]</td>
         </tr>
 
     
@@ -163,7 +219,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line152">line 152</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -212,99 +268,6 @@
 
     
 
-    <h4 class="name" id="handleInput"><span class="type-signature"></span>handleInput<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    This listens for key presses and sends the keys to your
-Player.handleInput() method. You don't need to modify this.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line174">line 174</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    void
-</div>
-
-
-
-    
-
-
-
-        
-            
-
-    
-
     <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">(x, y, spriteWidth, spriteHeight)</span><span class="type-signature"></span></h4>
 
     
@@ -312,7 +275,7 @@ Player.handleInput() method. You don't need to modify this.
 
 
 <div class="description">
-    Draw the player on screen. The logic relating to scoring is included in this method
+    Draw the canvasGameUnit on the screen. If the object property <em>debugBoundingBox</em> is enabled a bounding box is drawn around each object. This is helpful for debugging any issues collision logic.
 </div>
 
 
@@ -492,7 +455,7 @@ Player.handleInput() method. You don't need to modify this.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line199">line 199</a>
+        <a href="app.js.html">app.js</a>, <a href="app.js.html#line95">line 95</a>
     </li></ul></dd>
     
 
