@@ -3,6 +3,7 @@ frontend-nanodegree-arcade-game
 ===============================
 
 # Gameplay
+* The game can be played at the following [url](http://udaarcade.s3-website-us-east-1.amazonaws.com/)
 * Use the up/down/left/right keys to control the player
 * The goal of the game is to avoid the bugs and reach the "safe" area in the water (top of screen)
 * When the player reaches the safe area, their score increases by 10 points and the player moves back to the starting position
@@ -15,7 +16,7 @@ Aside from the requirements of the [rubric](https://review.udacity.com/#!/projec
 # Extra tooling related features
 ============
 1. gulp task for jsDoc; special comments are extracted from app.js. I looked at doxygen as well, but jsDoc seems to have more widespread usage. 
-2. gulp task for AWS s3 deployment. I wanted a free remote hosting option (other than github pages which I've already setup for www.purergb.com).I settled on using AWS s3. This is straight-forward to setup and allows a quick deployment from gulp (typical 3-5 seconds for small updates once files are cached).
+2. gulp task for AWS s3 deployment. I wanted a free remote hosting option (other than github pages which I've already setup for [PureRGB](www.purergb.com). I settled on using AWS s3. This is straight-forward to setup and allows a quick deployment from gulp (typical 3-5 seconds for small updates once files are cached).
 3. Investigated Javascript unit testing via Jasmine. Attempted to translate the rubric into a behaviour driven development plan. This is available in src/js/specs/ - remains a work in progress. Learnt a huge amount from exploring unit testing at this stage.
 4. Set up gulp based jasmine
 5. Investigated code coverage using a gulp plugin for Istanbul
